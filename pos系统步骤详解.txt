@@ -1,0 +1,376 @@
+这个系统使用的技术栈为：Vue+Webpack+Element+Axios+vueRouter.系统是简洁版一个快餐店的POS系统
+源码GitHub地址：https://github.com/shenghy/AwesomePOS
+一：用Mockplus把我们的想法画出来（一般是产品经理使用的，Mockplus就是一个线框图制作工具，能把我们的想法或者不太好用语言表达的地方，快速画出线框草图增加理解能力。）
+下载地址：https://www.mockplus.cn/ 
+下载好后注册一个账户，就可以正常使用了。
+二：Vue-cli搭建开发环境
+mpm install vue-cli -g
+vue init webpack AwesomePos
+进入项目目录之后 npm install安装package.json里项目的依赖包
+ npm run dev 
+---------------------------------------------------------------------------------------------------------------------------
+1.修改index.html的title为AwesomePOS-快餐管理系统，写样式 
+<style>
+      html,body,#app{height:100%;padding: 0;margin:0;}
+    </style>
+在src/components/page/目录下新建Pos.vue文件
+<template>
+  <div class="pos">
+   Hello Pos Demo!
+  </div>
+</template>
+ 
+<script>
+export default {
+  name: 'Pos'
+}
+</script>
+<style scoped>
+ 
+</style>
+修改路由文件，项目根目录/src/router/index.js，让入口文件变成Pos组件。
+先用import引入了Pos模板组件，然后修改routes里边的内容。
+import Vue from 'vue'
+import Router from 'vue-router'
+import Pos from '@/components/page/Pos'
+ 
+Vue.use(Router)
+ 
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'Pos',
+      component: Pos
+    }
+  ]
+})
+
+三：搞定项目图标Iconfont
+选定图标后有两个选择，下载代码 和 添加至项目。
+选择添加至项目，然后新建项目，并输入名称。
+项目添加好后，会自动转入到我们项目库中。点击查看在线链接。
+生产css引入的代码，生成后就可以在项目首页index.html引入了。
+ <link rel="stylesheet" href="http://at.alicdn.com/t/font_wyhhdpv5lhvbzkt9.css">
+图标的使用：
+<i class="icon iconfont icon-hanbao"></i>
+添加更多图标：
+1.去Iconfont网站继续挑选，把相中的图标加入购物车中。
+2.把购物车中的图标加入到项目中。
+3.重新生成在线链接。（这部很重要）
+4.在项目主页中(index.html)，更换css引入链接。
+四：编写独立的侧边栏导航组件
+建立leftNav.vue文件：
+在src/components目录下，先新建一个common和page文件夹。
+common文件夹用来放共用组件，下面写的leftNav.vue组件就放到这里。
+page文件夹用来放我们的页面模板组件，页面的模板文件放到这里。
+leftNav.vue
+<template>
+  <div class="left-nav">
+    <ul>
+        <li>
+            <i class="icon iconfont icon-wodezichan"></i>
+            <div>收银</div>
+        </li>
+ 
+        <li>
+            <i class="icon iconfont icon-dianpu"></i>
+            <div>店铺</div>
+        </li>
+ 
+        <li>
+            <i class="icon iconfont icon-hanbao"></i>
+            <div>商品</div>
+        </li>
+ 
+         <li>
+            <i class="icon iconfont icon-huiyuanqia"></i>
+            <div>会员</div>
+        </li>
+ 
+ 
+        <li>
+            <i class="icon iconfont icon-tongji"></i>
+            <div>统计</div>
+        </li>
+</ul>
+  </div>
+</template>
+ 
+<script>
+export default {
+  name: 'leftNav',
+  data () {
+    return {
+    }
+  }
+}
+</script>
+<style>
+ .left-nav{
+       color:#fff;
+       font-size:10px;
+       height:100%;
+       background-color: #1D8ce0;
+       float:left;
+       width:5%;
+    }
+    .iconfont{
+       font-size:24px;
+    }
+    .left-nav ul{
+        padding:0px;
+        margin: 0px;
+    }
+    .left-nav li{
+        list-style: none;
+        text-align: center;
+        border-bottom:1px solid #20a0ff;
+        padding:10px;
+    }
+</style>
+
+先用import在App.vue中引入leftNav组件。
+import leftNav from '@/components/common/leftNav'
+引入后在vue的构造器里（app.vue）添加components属性，并放入我们的leftNav组件。
+
+export default {
+  name: 'app',
+  components:{
+    leftNav
+  }
+}
+完整代码（app.vue）
+<template>
+  <div id="app">
+    <!--左侧导航-->
+    
+        <leftNav></leftNav>
+    
+    <!--操作区域-->
+    <div class="main">
+      <router-view></router-view>
+    </div>
+  </div>
+</template>
+ 
+<script>
+import leftNav from '@/components/common/leftNav'
+export default {
+  name: 'app',
+  components:{
+    leftNav
+  }
+}
+</script>
+ 
+<style>
+#app {
+  font-family: 'Microsoft YaHei','Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: left;
+  color: #2c3e50;
+   height:100%;
+}
+ 
+.main{
+  float:left;
+  width:95%; 
+  background-color: #EFF2F7;
+  height:100%;
+  overflow: auto;
+ 
+}
+</style>
+五：开启Element封印（Element ui）
+Element是一套为开发者、设计师和产品经理准备的基于Vue2.0的组件库，提供了配套设计资源，帮助你的网站快速成型。在项目中自己写组件虽然灵活，但是效率并不高效，所以要学会站在巨人的肩膀上干活，Element就是巨人的肩旁，也是现在国内比较成熟的以一套Vue的组件库。所以使用这个组件库开发项目。
+npm安装
+npm install element-ui --save
+在main.js中写入以下内容:（需要注意的是，样式文件需要单独引入。）
+import Vue from 'vue'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-default/index.css'
+import App from './App.vue'
+ 
+Vue.use(ElementUI)
+ 
+new Vue({
+  el: '#app',
+  render: h => h(App)
+})
+在Pos.vue里添加模版布局：
+<template>
+  <div class="pos">
+    <div>
+        <el-row >
+            <el-col :span='7'>
+            我是订单栏
+            </el-col>
+            <!--商品展示-->
+            <el-col :span="17">
+             我是产品栏
+            </el-col>
+        </el-row>
+    </div>
+  </div>
+</template>
+ 
+<script>
+export default {
+  name: 'Pos',
+  data () {
+    return { 
+    }
+  }
+}
+</script>
+<style scoped>
+</style>
+
+解决100%高的问题
+mounted:function(){
+      var orderHeight=document.body.clientHeight;
+      document.getElementById("order-list").style.height=orderHeight+'px';
+  },
+el-tabs标签页组件（label属性就是你标签页的标题）
+<el-tabs>
+      <el-tab-pane label="点餐">
+       点餐   
+      </el-tab-pane>
+      <el-tab-pane label="挂单">
+      挂单
+      </el-tab-pane>
+      <el-tab-pane label="外卖">
+      外卖
+     </el-tab-pane>
+</el-tabs>
+el-table组件制作表格（在第1行中的:data是用来绑定数据源的， border代表表格有边框效果）
+<el-table :data="tableData" border show-summary style="width: 100%" >
+ 
+    <el-table-column prop="goodsName" label="商品"  ></el-table-column>
+    <el-table-column prop="count" label="量" width="50"></el-table-column>
+    <el-table-column prop="price" label="金额" width="70"></el-table-column>
+    <el-table-column  label="操作" width="100" fixed="right">
+        <template scope="scope">
+            <el-button type="text" size="small">删除</el-button>
+            <el-button type="text" size="small">增加</el-button>
+ 
+        </template>
+    </el-table-column>
+</el-table>
+
+el-button 按钮组件（el-button 的type属性是设置按钮样式的）
+<el-button type="warning" >挂单</el-button>
+<el-button type="danger" >删除</el-button>
+<el-button type="success" >结账</el-button>
+type0Goods:[
+          {
+              goodsId:1,
+              goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos001.jpg",
+              goodsName:'香辣鸡腿堡',
+              price:18
+          }, {
+              goodsId:2,
+              goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos002.jpg",
+              goodsName:'田园鸡腿堡',
+              price:15
+          }, {
+              goodsId:3,
+              goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos004.jpg",
+              goodsName:'和风汉堡',
+              price:15
+          }, {
+              goodsId:4,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos003.jpg",
+              goodsName:'快乐全家桶',
+              price:80
+          }, {
+              goodsId:5,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos003.jpg",
+              goodsName:'脆皮炸鸡腿',
+              price:10
+          }, {
+              goodsId:6,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos004.jpg",
+              goodsName:'魔法鸡块',
+              price:20
+          }, {
+              goodsId:7,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos001.jpg",
+              goodsName:'可乐大杯',
+              price:10
+          }, {
+              goodsId:8,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos003.jpg",
+              goodsName:'雪顶咖啡',
+              price:18
+          }, {
+              goodsId:9,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos002.jpg",
+              goodsName:'大块鸡米花',
+              price:15
+          }, {
+              goodsId:20,
+               goodsImg:"http://7xjyw1.com1.z0.glb.clouddn.com/pos002.jpg",
+              goodsName:'香脆鸡柳',
+              price:17
+          }
+          
+      ],
+
+用v-for改造无序列表：
+<li v-for="goods in type0Goods">
+    <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
+    <span class="foodName">{{goods.goodsName}}</span>
+    <span class="foodPrice">￥{{goods.price}}元</span>
+</li>
+Axios从远程读取数据（把商品数据从远端读取到页面上）
+安装Axios
+npm install axios --save（由于axios是需要打包到生产环境中的，所以我们使用–save来进行安装。
+在Pos.vue页面引入Axios，由于使用了npm来进行安装，所以这里不需要填写路径。
+import axios from 'axios'
+服务端拉取常用商品数据
+远端服务器地址：http://jspang.com/DemoApi/oftenGoods.php
+ created(){
+      axios.get('http://jspang.com/DemoApi/oftenGoods.php')
+      .then(response=>{
+         console.log(response);
+         this.oftenGoods=response.data;
+      })
+      .catch(error=>{
+          console.log(error);
+          alert('网络错误，不能访问');
+      })
+  },
+把axios的方法写到了created钩子函数中，我们使用了get 方法进行拉取数据，如果拉取成功用远端数据对oftenGoods进行赋值。
+<ul class='cookList'>
+     <li v-for="goods in type3Goods">
+         <span class="foodImg"><img :src="goods.goodsImg" width="100%"></span>
+         <span class="foodName">{{goods.goodsName}}</span>
+         <span class="foodPrice">￥{{goods.price}}元</span>
+      </li>
+</ul>
+九：订单模块制作 核心功能-1
+添加商品到订单页面
+pos.vue里加入methods方法，在methods方法里再加入addOrderList方法。这个方法的作用是点击右侧的商品，然后把商品添加到左边的列表里。
+写完这个方法后，还需要在商品上绑定方法，来进行调用添加方法。 @click="addOrderList(goods)"
+
+删除单个商品
+删除全部订单商品
+模拟结账
+项目打包和上线（详情参照项目代码内有注释）
+打包注意事项：
+1、把绝对路径改为相对路径
+config/index.js 会看到一个build属性，这里就我们打包的基本配置了。你在这里可以修改打包的目录，打包的文件名。最重要的是一定要把绝对目录改为相对目录。
+assetsPublicPath:'./'
+这样才能保证打包出去的项目可以正常预览。
+在命令行中用npm run build  进行打包。
+	
+npm run build
+
+
+
+
+
+
